@@ -1,0 +1,129 @@
+name: Infra CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+    working-directory: terraform
+
+jobs:
+  terraform-plan-nonprod:
+    name: Terraform Plan Non-Prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: tf-version
+        name: Read Terraform version
+        run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.0
+        with:
+          terraform_version: ${{ steps.tf-version.outputs.version }}
+
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            terraform/.terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Init (Non-Prod)
+        run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
+
+      - name: Terraform Plan (Non-Prod)
+        run: terraform plan -input=false -no-color -detailed-exitcode -lock-timeout=300s -out=plan.out -var-file=env/nonprod/nonprod.tfvars
+
+  # terraform-plan-prod:
+  #   name: Terraform Plan Prod
+  #   runs-on: ubuntu-latest
+  #   needs: terraform-plan-nonprod
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v3.1.0
+  #       with:
+  #         terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
+
+  #     - name: Cache Terraform
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           ~/.terraform.d/plugin-cache
+  #           terraform/.terraform
+  #         key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-terraform-
+
+  #     - name: Terraform Format Check
+  #       run: terraform -chdir=envs/prod fmt -check
+
+  #     - name: Terraform Validate
+  #       run: terraform -chdir=envs/prod validate
+
+  #     - name: Terraform Init (Prod)
+  #       run: terraform -chdir=envs/prod init
+
+  #     - name: Terraform Plan (Prod)
+  #       run: terraform -chdir=envs/prod plan -var-file=../../env/prod.tfvars
+
+  apply-nonprod:
+    name: Terraform Apply Non-Prod
+    runs-on: ubuntu-latest
+    needs: terraform-plan-nonprod
+    environment:
+      name: apply-nonprod
+      # Manual approval must be required in GitHub UI
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.0
+        with:
+          terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
+
+      - name: Terraform Init
+        run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
+
+      - name: Terraform Apply
+        run: terraform  apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out
+
+  # apply-prod:
+  #   name: Terraform Apply Prod
+  #   runs-on: ubuntu-latest
+  #   needs: apply-nonprod
+  #   environment:
+  #     name: apply-prod
+  #     # Manual approval must be required in GitHub UI
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v3.1.0
+  #       with:
+  #         terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
+
+  #     - name: Terraform Init
+  #       run: terraform -chdir=envs/prod init
+
+  #     - name: Terraform Apply
+  #       run: terraform -chdir=envs/prod apply -var-file=../../env/prod.tfvars -auto-approve
