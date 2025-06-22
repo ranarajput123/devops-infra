@@ -24,3 +24,4 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           export_environment_variables: true
           create_credentials_file: true
+          cleanup_credentials: false
