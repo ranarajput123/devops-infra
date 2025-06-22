@@ -13,10 +13,20 @@ defaults:
 jobs:
   terraform-plan-nonprod:
     name: Terraform Plan Non-Prod
+    env:
+      GOOGLE_CLOUD_PROJECT: devops-learning-007
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
 
       - id: tf-version
         name: Read Terraform version
@@ -41,59 +51,37 @@ jobs:
         run: terraform fmt -check
 
       - name: Terraform Init (Non-Prod)
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan (Non-Prod)
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform plan -input=false -no-color -detailed-exitcode -lock-timeout=300s -out=plan.out -var-file=env/nonprod/nonprod.tfvars
-
-  # terraform-plan-prod:
-  #   name: Terraform Plan Prod
-  #   runs-on: ubuntu-latest
-  #   needs: terraform-plan-nonprod
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3.1.0
-  #       with:
-  #         terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
-
-  #     - name: Cache Terraform
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ~/.terraform.d/plugin-cache
-  #           terraform/.terraform
-  #         key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-terraform-
-
-  #     - name: Terraform Format Check
-  #       run: terraform -chdir=envs/prod fmt -check
-
-  #     - name: Terraform Validate
-  #       run: terraform -chdir=envs/prod validate
-
-  #     - name: Terraform Init (Prod)
-  #       run: terraform -chdir=envs/prod init
-
-  #     - name: Terraform Plan (Prod)
-  #       run: terraform -chdir=envs/prod plan -var-file=../../env/prod.tfvars
 
   apply-nonprod:
     name: Terraform Apply Non-Prod
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_CLOUD_PROJECT: devops-learning-007
     needs: terraform-plan-nonprod
     environment:
-      name: apply-nonprod
-      # Manual approval must be required in GitHub UI
+      name: apply-nonprod  # Must be configured in GitHub with manual approval
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.0
@@ -101,29 +89,11 @@ jobs:
           terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
 
       - name: Terraform Init
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Apply
-        run: terraform  apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out
-
-  # apply-prod:
-  #   name: Terraform Apply Prod
-  #   runs-on: ubuntu-latest
-  #   needs: apply-nonprod
-  #   environment:
-  #     name: apply-prod
-  #     # Manual approval must be required in GitHub UI
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3.1.0
-  #       with:
-  #         terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
-
-  #     - name: Terraform Init
-  #       run: terraform -chdir=envs/prod init
-
-  #     - name: Terraform Apply
-  #       run: terraform -chdir=envs/prod apply -var-file=../../env/prod.tfvars -auto-approve
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out
