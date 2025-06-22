@@ -5,10 +5,6 @@ module "vpc" {
   env           = var.environment
   routing_mode  = "REGIONAL"
   vpc_main_cidr = "10.0.0.0/16"
-
-  providers = {
-    google = google
-  }
 }
 
 module "gke_cluster" {
@@ -19,10 +15,6 @@ module "gke_cluster" {
   subnet_id      = module.vpc.subnet_id
   pods_cidr      = module.vpc.pods_cidr
   services_cidr  = module.vpc.services_cidr
-
-  providers = {
-    google = google
-  }
 }
 
 module "flux" {
@@ -36,13 +28,6 @@ module "flux" {
   gitops_repo_name    = "devops-gitops"
   github_token        = data.google_secret_manager_secret_version.github_token.secret_data
   project             = var.project
-
-
-
-  providers = {
-    google = google
-    github = github
-  }
 }
 
 # Just creating a single key for now due to learning purpose, can be extended later
@@ -52,10 +37,6 @@ module "kms" {
   project       = var.project
   key_ring_name = "devops-learning-key-ring"
   key_name      = "devops-learning-crypto-key"
-
-  providers = {
-    google = google
-  }
 }
 
 module "teams" {
@@ -64,8 +45,4 @@ module "teams" {
   frontend_devs   = []
   backend_devs    = []
   full_stack_devs = []
-
-  providers = {
-    google = google
-  }
 }
