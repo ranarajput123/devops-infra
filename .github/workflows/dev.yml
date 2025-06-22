@@ -20,7 +20,7 @@ env:
 jobs:
   auth:
     name: Authenticate to Google Cloud
-    uses: ./.github/workflows/authenticate.yml
+    uses: ./.github/workflows/auth.yml
     secrets:
       GCP_WORKLOAD_IDENTITY_POOL: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}
       GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
