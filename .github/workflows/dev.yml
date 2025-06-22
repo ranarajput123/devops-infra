@@ -56,16 +56,12 @@ jobs:
         run: terraform fmt -check
 
       - name: Terraform Init (Non-Prod)
-        env:
-          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan (Non-Prod)
-        env:
-          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform plan -input=false -no-color -detailed-exitcode -lock-timeout=300s -out=plan.out -var-file=env/nonprod/nonprod.tfvars
 
   apply-nonprod:
@@ -86,11 +82,7 @@ jobs:
           terraform_version: ${{ needs.terraform-plan-nonprod.outputs.tf-version }}
 
       - name: Terraform Init
-        env:
-          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Apply
-        env:
-          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out
