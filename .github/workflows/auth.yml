@@ -1,0 +1,27 @@
+name: Authenticate
+
+on:
+  workflow_call:
+    secrets:
+      GCP_WORKLOAD_IDENTITY_POOL:
+        required: true
+      GCP_SERVICE_ACCOUNT_EMAIL:
+        required: true
+    outputs:
+      access_token:
+        description: "Google Cloud access token"
+        value: ${{ jobs.auth.outputs.access_token }}
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    outputs:
+      access_token: ${{ steps.auth.outputs.access_token }}
+    steps:
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
