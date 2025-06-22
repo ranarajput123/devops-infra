@@ -6,7 +6,7 @@ resource "google_project_iam_custom_role" "full_stack_dev" {
 
 resource "google_project_iam_member" "full_stack_dev" {
   for_each = toset(var.full_stack_devs)
-  project  = var.project_id
+  project  = var.project
   role     = google_project_iam_custom_role.full_stack_dev.id
   member   = "user:${each.value}"
 }
@@ -19,7 +19,7 @@ resource "google_project_iam_custom_role" "backend_dev" {
 
 resource "google_project_iam_member" "backend_dev" {
   for_each = toset(var.backend_devs)
-  project  = var.project_id
+  project  = var.project
   role     = google_project_iam_custom_role.backend_dev.id
   member   = "user:${each.value}"
 }
@@ -32,7 +32,7 @@ resource "google_project_iam_custom_role" "frontend_dev" {
 
 resource "google_project_iam_member" "frontend_dev" {
   for_each = toset(var.frontend_devs)
-  project  = var.project_id
+  project  = var.project
   role     = google_project_iam_custom_role.frontend_dev.id
   member   = "user:${each.value}"
 }

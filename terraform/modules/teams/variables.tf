@@ -1,4 +1,4 @@
-variable "project_id" {
+variable "project" {
   description = "The ID of the project where the IAM roles will be applied"
   type        = string
 }
