@@ -40,7 +40,6 @@ module "flux" {
 
 
   providers = {
-    flux   = flux
     google = google
     github = github
   }
