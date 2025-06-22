@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+  workflow_call:
+    secrets:
+      GCP_WORKLOAD_IDENTITY_POOL:
+        required: true
+      GCP_SERVICE_ACCOUNT_EMAIL:
+        required: true
 
 permissions:
   id-token: write
@@ -18,20 +24,28 @@ env:
   GOOGLE_CLOUD_PROJECT: ${{ secrets.NP_GCP_PROJECT }}
 
 jobs:
-  auth:
-    name: Authenticate to Google Cloud
-    uses: ./.github/workflows/auth.yml
-    secrets:
-      GCP_WORKLOAD_IDENTITY_POOL: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}
-      GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
-
   terraform-plan-nonprod:
     name: Terraform Plan Non-Prod
     runs-on: ubuntu-latest
-    needs: auth
+    outputs:
+      tf-version: ${{ steps.tf-version.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
+          export_environment_variables: true
+          create_credentials_file: true
+      
+      - name: Echo GOOGLE_APPLICATION_CREDENTIALS
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
+
 
       - id: tf-version
         name: Read Terraform version
@@ -67,14 +81,22 @@ jobs:
   apply-nonprod:
     name: Terraform Apply Non-Prod
     runs-on: ubuntu-latest
-    needs: 
-      - terraform-plan-nonprod
-      - auth
+    needs: terraform-plan-nonprod
     environment:
       name: apply-nonprod  # Must be configured in GitHub with manual approval
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
+          export_environment_variables: true
+          create_credentials_file: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.0
