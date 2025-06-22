@@ -40,10 +40,10 @@ module "teams" {
 
 # Just creating a single key for now due to learning purpose, can be extended later
 module "kms" {
-  source  = "./modules/kms"
-  region  = var.region
-  project = var.project
+  source        = "./modules/kms"
+  region        = var.region
+  project       = var.project
   key_ring_name = "devops-learning-key-ring"
-  key_name = "devops-learning-crypto-key"
+  key_name      = "devops-learning-crypto-key"
 }
 
