@@ -92,7 +92,7 @@ resource "flux_bootstrap_git" "this" {
   ]
 
   # Secret where the GitOps deploy will be stored
-  secret_name = "gitops_deploy_key"
+  secret_name = "gitops-deploy-key"
 
   # Path for flux to manage resources at in gitops repository
   path = "releases/${var.environment}"
