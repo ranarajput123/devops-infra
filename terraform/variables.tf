@@ -22,3 +22,13 @@ variable "github_owner" {
   description = "GitHub owner (user or organization)"
   type        = string
 }
+
+variable "gitops_repo_name" {
+  description = "Name of the GitOps repository"
+  type        = string
+}
+
+variable "charts_repo_name" {
+  description = "Name of the Helm Charts repository"
+  type        = string
+}
