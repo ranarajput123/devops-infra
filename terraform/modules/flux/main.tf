@@ -21,9 +21,10 @@ resource "github_repository_deploy_key" "gitops_deploy_key" {
 # Adding provider block here because of dependency on ssh key
 provider "flux" {
   kubernetes = {
-    host                   = var.api_server_endpoint
-    cluster_ca_certificate = var.b64_ca_cert
-    token                  = var.gcp_access_token
+    # host                   = var.api_server_endpoint
+    # cluster_ca_certificate = var.b64_ca_cert
+    # token                  = var.gcp_access_token
+    config_path = "~/.kube/config"
   }
   git = {
     url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
