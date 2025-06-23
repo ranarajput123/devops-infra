@@ -21,6 +21,11 @@ defaults:
     shell: bash
     working-directory: terraform
 
+env:
+  TF_IN_AUTOMATION: true
+  TF_INPUT: false
+  TF_CLI_ARGS: '-no-color'
+  TF_LOG: 'DEBUG'
 jobs:
   plan-nonprod:
     name: Terraform Plan Non-Prod
