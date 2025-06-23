@@ -73,10 +73,23 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false -no-color -detailed-exitcode -lock-timeout=300s -out=plan.out -var-file=env/nonprod/nonprod.tfvars
+        id: plan
+        run: |
+          terraform plan \
+           -input=false \
+           -no-color \
+           -detailed-exitcode \
+           -lock-timeout=300s \
+           -out=plan.out \
+           -var-file=env/nonprod/nonprod.tfvars
+          if [ "$EXIT_CODE" -eq 1 ]; then
+            echo "Terraform plan failed"
+            exit 1
+          fi
+        continue-on-error: true
       
       - name: Upload Plan File For Apply Job
-        if: success() && github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
+        if: steps.plan.outcome == 'success' ||  steps.plan.outcome == 'failure' && github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
         uses: actions/upload-artifact@v4
         with:
           name: tfplan-nonprod
