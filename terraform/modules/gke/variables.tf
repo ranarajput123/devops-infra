@@ -16,8 +16,18 @@ variable "subnet_id" {
   type        = string
 }
 
+variable "pods_ip_range_name" {
+  description = "The name of the secondary range for pods in the GKE cluster."
+  type        = string
+}
+
 variable "pods_cidr" {
   description = "value of the CIDR range for pods in the GKE cluster."
+  type        = string
+}
+
+variable "services_ip_range_name" {
+  description = "The name of the secondary range for services in the GKE cluster."
   type        = string
 }
 

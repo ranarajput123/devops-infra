@@ -19,8 +19,8 @@ resource "google_container_cluster" "primary" {
   }
 
   ip_allocation_policy {
-    cluster_secondary_range_name  = var.pods_cidr
-    services_secondary_range_name = var.services_cidr
+    cluster_secondary_range_name  = var.pods_ip_range_name
+    services_secondary_range_name = var.services_ip_range_name
   }
 
   cost_management_config {

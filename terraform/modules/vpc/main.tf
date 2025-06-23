@@ -19,7 +19,6 @@ resource "google_compute_subnetwork" "private_subnet" {
   secondary_ip_range {
     range_name    = "pods"
     ip_cidr_range = local.pods_cidr
-
   }
 
   secondary_ip_range {
