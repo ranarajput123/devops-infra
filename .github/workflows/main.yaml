@@ -144,6 +144,11 @@ jobs:
         with:
           name: tfplan-nonprod
           path: terraform
+      
+      - name: Debug directory contents
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -lah
 
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
