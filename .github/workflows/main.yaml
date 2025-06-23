@@ -82,6 +82,7 @@ jobs:
            -lock-timeout=300s \
            -out=plan.out \
            -var-file=env/nonprod/nonprod.tfvars
+           EXIT_CODE=$?
           if [ "$EXIT_CODE" -eq 1 ]; then
             echo "Terraform plan failed"
             exit 1
@@ -89,7 +90,7 @@ jobs:
         continue-on-error: true
       
       - name: Upload Plan File For Apply Job
-        if: steps.plan.outcome == 'success' ||  steps.plan.outcome == 'failure' && github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
+        if: github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
         uses: actions/upload-artifact@v4
         with:
           name: tfplan-nonprod
