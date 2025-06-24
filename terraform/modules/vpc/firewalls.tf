@@ -31,7 +31,7 @@ resource "google_compute_firewall" "allow_health_check_egress" {
   destination_ranges = ["130.211.0.0/22", "35.191.0.0/16"] // GCP LB health check IP ranges
   priority           = 990
 
-  depends_on = [module.net]
+  depends_on = [google_compute_network.vpc_network]
 }
 
 # # # # # #  Private subnet fire-walling. Allow all traffic within the private subnet, deny all traffic from outside the private subnet, and allow egress to the internet. # # # # # # #
@@ -48,7 +48,7 @@ resource "google_compute_firewall" "allow_private_subnet" {
   target_tags   = ["private"]
   priority      = 990
 
-  depends_on = [google_compute_network.vpc_network.network_id]
+  depends_on = [google_compute_network.vpc_network]
 }
 
 resource "google_compute_firewall" "deny_access_private_subnet" {
@@ -64,7 +64,7 @@ resource "google_compute_firewall" "deny_access_private_subnet" {
   target_tags   = ["private"]
   priority      = 1010
 
-  depends_on = [google_compute_network.vpc_network.network_id]
+  depends_on = [google_compute_network.vpc_network]
 }
 
 resource "google_compute_firewall" "allow_internet_egress_private_subnet" {
@@ -80,5 +80,5 @@ resource "google_compute_firewall" "allow_internet_egress_private_subnet" {
   target_tags        = ["private"]
   priority           = 990
 
-  depends_on = [google_compute_network.vpc_network.network_id]
+  depends_on = [google_compute_network.vpc_network]
 }
