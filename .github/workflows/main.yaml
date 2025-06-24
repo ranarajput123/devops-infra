@@ -55,27 +55,18 @@ jobs:
         with:
           terraform_version: ${{ steps.tf-version.outputs.version }}
 
-      - name: Debug directory contentsAdd commentMore actions
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -lah
       - name: Cache Terraform
         uses: actions/cache@v3
         with:
           path: |
             ~/.terraform.d/plugin-cache
             terraform/.terraform
-          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
+          key: ${{ runner.os }}-cached-terraform-${{ hashFiles('**/*.tf') }}
           restore-keys: |
-            ${{ runner.os }}-terraform-
+            ${{ runner.os }}-cached-terraform-
 
       - name: Terraform Format Check
         run: terraform fmt -check
-      
-      - name: Debug directory contentsAdd commentMore actions
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -lah
 
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
