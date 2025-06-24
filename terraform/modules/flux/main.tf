@@ -15,7 +15,7 @@ resource "github_repository_deploy_key" "gitops_deploy_key" {
   repository = var.gitops_repo_name
   title      = "Flux Git ops Deploy Key"
   key        = tls_private_key.gitops_ssh_key.public_key_openssh
-  read_only  = true
+  read_only  = false
 }
 
 # Adding provider block here because of dependency on ssh key
@@ -69,16 +69,16 @@ resource "kubernetes_secret" "ghcr_creds" {
   }
 
   data = {
-    ".dockerconfigjson" = base64encode(jsonencode({
+    ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
           username = "git"
           password = var.github_token
           email    = "flux@image-automation.com"
-          # auth     = base64encode("git:${var.github_token}")
+          auth     = base64encode("git:${var.github_token}")
         }
       }
-    }))
+    })
   }
 
   type = "kubernetes.io/dockerconfigjson"
