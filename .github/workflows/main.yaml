@@ -46,8 +46,11 @@ jobs:
           export_environment_variables: true
           create_credentials_file: true
       
-      - name: Echo GOOGLE_APPLICATION_CREDENTIALS
-        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
+      - name: "Debug: Show SA email in credentials file"
+        run: cat "$GOOGLE_APPLICATION_CREDENTIALS" | jq '.client_email'
+
+      - name: Who am I (gcloud)
+        run: gcloud auth print-identity-token && gcloud auth print-access-token && gcloud config get-value account
 
       - id: tf-version
         name: Read Terraform version
