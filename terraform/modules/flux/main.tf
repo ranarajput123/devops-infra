@@ -76,7 +76,7 @@ resource "kubernetes_secret" "ghcr_creds" {
           username = "git"
           password = var.github_token
           email    = "flux@image-automation.com"
-          auth     = base64encode("git:${var.github_token}")
+          # auth     = base64encode("git:${var.github_token}")
         }
       }
     }))
