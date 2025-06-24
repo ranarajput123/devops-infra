@@ -34,6 +34,8 @@ resource "google_container_cluster" "primary" {
     services_secondary_range_name = var.services_ip_range_name
   }
 
+  deletion_protection = false
+
   cost_management_config {
     enabled = true
   }
