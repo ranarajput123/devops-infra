@@ -16,7 +16,7 @@ resource "google_container_cluster" "primary" {
   }
   node_config {
     workload_metadata_config {
-      mode = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
     machine_type = "e2-medium"
     oauth_scopes = [
