@@ -90,6 +90,14 @@ jobs:
             exit 1
           fi
         continue-on-error: true
+      - name: Terraform Plan
+        id: applt-tem
+        run: |
+          terraform apply \
+          -target=module.gcp.google_project_service.api \
+          -var-file=env/nonprod/nonprod.tfvars \
+          
+        
       
       - name: Upload Plan File For Apply Job
         if: github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
