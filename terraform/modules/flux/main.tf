@@ -37,8 +37,6 @@ provider "flux" {
     }
   }
 
-  # This ensures cluster is created before using it
-  depends_on = [google_container_cluster.primary]
   git = {
     url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
     ssh = {
