@@ -5,54 +5,6 @@ resource "kubernetes_namespace" "flux" {
   }
 }
 
-# Git ops key pair for Flux
-resource "tls_private_key" "gitops_ssh_key" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P256"
-}
-
-resource "github_repository_deploy_key" "gitops_deploy_key" {
-  repository = var.gitops_repo_name
-  title      = "Flux Git ops Deploy Key"
-  key        = tls_private_key.gitops_ssh_key.public_key_openssh
-  read_only  = false
-}
-
-# Adding provider block here because of dependency on ssh key
-provider "flux" {
-  kubernetes = {
-    host                   = var.api_server_endpoint
-    cluster_ca_certificate = var.b64_ca_cert
-
-    exec = {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "gcloud"
-      args        = ["auth", "print-access-token"]
-    }
-  }
-
-  git = {
-    url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
-    ssh = {
-      username    = "git"
-      private_key = tls_private_key.gitops_ssh_key.private_key_pem
-    }
-  }
-}
-
-# Helm charts key pair for Flux
-resource "tls_private_key" "charts_ssh_key" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P256"
-}
-
-resource "github_repository_deploy_key" "charts_deploy_key" {
-  repository = var.charts_repo_name
-  title      = "Flux Charts Deploy Key"
-  key        = tls_private_key.charts_ssh_key.public_key_openssh
-  read_only  = false
-}
-
 # Create kubernetes secret for Charts deploy key
 resource "kubernetes_secret" "charts_deploy_key" {
   metadata {
@@ -61,9 +13,9 @@ resource "kubernetes_secret" "charts_deploy_key" {
   }
 
   data = {
-    identity     = tls_private_key.charts_ssh_key.private_key_pem
-    identity_pub = tls_private_key.charts_ssh_key.public_key_openssh
-    known_hosts  = local.github_known_hosts
+    identity     = var.charts_private_key_pem
+    identity_pub = var.charts_public_key_openssh
+    known_hosts  = var.github_known_hosts
   }
 }
 
@@ -108,5 +60,5 @@ resource "flux_bootstrap_git" "this" {
 
   log_level = "debug"
 
-  depends_on = [kubernetes_namespace.flux, github_repository_deploy_key.gitops_deploy_key]
+  depends_on = [kubernetes_namespace.flux]
 }
