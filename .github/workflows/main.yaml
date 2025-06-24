@@ -46,20 +46,6 @@ jobs:
           export_environment_variables: true
           create_credentials_file: true
       
-      - name: Save credentials file for inspection
-        run: cp "$GOOGLE_APPLICATION_CREDENTIALS" ./gha-creds.json
-      
-      - name: Debug directory contents
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -lah
-
-      - name: Upload GHA credentials file
-        uses: actions/upload-artifact@v4
-        with:
-          name: gha-creds-debug
-          path: terraform/gha-creds.json
-
       - id: tf-version
         name: Read Terraform version
         run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
@@ -69,31 +55,24 @@ jobs:
         with:
           terraform_version: ${{ steps.tf-version.outputs.version }}
 
-      # - name: Cache Terraform
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       ~/.terraform.d/plugin-cache
-      #       terraform/.terraform
-      #     key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-terraform-
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            terraform/.terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
 
       - name: Terraform Format Check
         run: terraform fmt -check
-
-      - name: Clean .terraform directory
-        run: |
-          rm -rf .terraform
 
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Validate
         run: terraform validate
-
-      - name: Who am I
-        run: gcloud auth list && gcloud config list
 
       - name: Terraform Plan
         id: plan
@@ -168,11 +147,6 @@ jobs:
           name: tfplan-nonprod
           path: terraform
       
-      - name: Debug directory contents
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -lah
-
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 

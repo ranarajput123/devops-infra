@@ -11,6 +11,6 @@ locals {
   services_cidr = cidrsubnet(var.vpc_main_cidr, 3, 3)
 
   # 10.0.128.0/20 - Ip range 10.0.128.0 to 10.0.143.255
-  master_node_cidr = cidrsubnet(var.vpc_main_cidr, 4, 8)
+  master_node_cidr = cidrsubnet(var.vpc_main_cidr, 12, 2048)
 
 }
