@@ -46,3 +46,15 @@ resource "google_compute_router_nat" "nat" {
 
   depends_on = [google_compute_network.vpc_network]
 }
+
+# Add route because without it the NAT gateway will not be used for egress traffic
+resource "google_compute_route" "egress_to_internet_via_nat" {
+  name             = "allow-egress-via-nat"
+  network          = google_compute_network.vpc_network.id
+  dest_range       = "0.0.0.0/0"
+  next_hop_gateway = "default-internet-gateway"
+  priority         = 1000
+  tags             = ["private"]
+
+  depends_on = [google_compute_network.vpc_network]
+}
