@@ -47,7 +47,7 @@ jobs:
           create_credentials_file: true
       
       - name: "Debug: Show SA email in credentials file"
-        run: cat "$GOOGLE_APPLICATION_CREDENTIALS" | jq '.client_email'
+        run: cat "$GOOGLE_APPLICATION_CREDENTIALS"
 
       - name: Who am I (gcloud)
         run: gcloud auth print-identity-token && gcloud auth print-access-token && gcloud config get-value account
