@@ -28,3 +28,21 @@ resource "google_compute_subnetwork" "private_subnet" {
   }
 
 }
+resource "google_compute_router" "router" {
+  name    = "${var.env}-nat-router"
+  network = google_compute_network.vpc_network.id
+  region  = var.region
+
+  depends_on = [google_compute_network.vpc_network]
+}
+resource "google_compute_router_nat" "nat" {
+  name                               = "${var.env}-nat-config"
+  router                             = google_compute_router.router.name
+  region                             = var.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  enable_endpoint_independent_mapping = true
+
+  depends_on = [google_compute_network.vpc_network]
+}

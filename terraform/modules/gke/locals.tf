@@ -22,7 +22,7 @@ locals {
     "104.30.134.19/32",
   ]
 
-  node_pool_sa_permissions = [
+  node_pool_sa_additional_permissions = [
     "artifactregistry.dockerimages.get",
     "artifactregistry.dockerimages.list",
     "artifactregistry.repositories.downloadArtifacts",
