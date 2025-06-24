@@ -48,12 +48,22 @@ jobs:
       
       - name: Save credentials file for inspection
         run: cp "$GOOGLE_APPLICATION_CREDENTIALS" ./gha-creds.json
+      
+      - name: Debug directory contents
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -lah
+      
+      - name: Debug directory contents
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -lah terraform/
 
       - name: Upload GHA credentials file
         uses: actions/upload-artifact@v4
         with:
           name: gha-creds-debug
-          path: gha-creds.json
+          path: terraform/gha-creds.json
 
       - id: tf-version
         name: Read Terraform version
