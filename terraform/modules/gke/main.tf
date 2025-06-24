@@ -2,14 +2,6 @@ resource "google_container_cluster" "primary" {
   name     = "${var.env}-gke-cluster"
   location = var.region
 
-  initial_node_count = 1
-  node_config {
-    machine_type = "e2-micro"
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform",
-    ]
-  }
-
   network    = var.vpc_network_id
   subnetwork = var.subnet_id
 
@@ -23,6 +15,23 @@ resource "google_container_cluster" "primary" {
 
   #   }
   # }
+  timeouts {
+    create = "30m"
+
+  }
+  node_pool {
+    autoscaling {
+      min_node_count = 1
+      max_node_count = 2
+    }
+
+    node_config {
+      machine_type = "e2-medium"
+      oauth_scopes = [
+        "https://www.googleapis.com/auth/cloud-platform",
+      ]
+    }
+  }
 
   private_cluster_config {
     enable_private_nodes    = true
