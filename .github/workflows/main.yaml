@@ -138,7 +138,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           token_format: 'access_token'
-          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}
           service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
           export_environment_variables: true
           create_credentials_file: true
