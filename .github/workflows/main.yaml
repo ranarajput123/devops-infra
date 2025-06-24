@@ -58,18 +58,22 @@ jobs:
         with:
           terraform_version: ${{ steps.tf-version.outputs.version }}
 
-      - name: Cache Terraform
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.terraform.d/plugin-cache
-            terraform/.terraform
-          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-
+      # - name: Cache Terraform
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.terraform.d/plugin-cache
+      #       terraform/.terraform
+      #     key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-terraform-
 
       - name: Terraform Format Check
         run: terraform fmt -check
+
+      - name: Clean .terraform directory
+        run: |
+          rm -rf .terraform
 
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
