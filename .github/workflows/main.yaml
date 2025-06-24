@@ -46,11 +46,14 @@ jobs:
           export_environment_variables: true
           create_credentials_file: true
       
-      - name: "Debug: Show SA email in credentials file"
-        run: cat "$GOOGLE_APPLICATION_CREDENTIALS"
+      - name: Save credentials file for inspection
+        run: cp "$GOOGLE_APPLICATION_CREDENTIALS" ./gha-creds.json
 
-      - name: Who am I (gcloud)
-        run: gcloud auth print-identity-token && gcloud auth print-access-token && gcloud config get-value account
+      - name: Upload GHA credentials file
+        uses: actions/upload-artifact@v4
+        with:
+          name: gha-creds-debug
+          path: gha-creds.json
 
       - id: tf-version
         name: Read Terraform version
