@@ -81,6 +81,9 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Who am I
+        run: gcloud auth list && gcloud config list
+
       - name: Terraform Plan
         id: plan
         run: |
