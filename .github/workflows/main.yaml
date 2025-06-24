@@ -160,6 +160,5 @@ jobs:
 
       - name: Terraform Apply
         run: |
-          terraform import -var-file=env/nonprod/nonprod.tfvars module.flux.kubernetes_secret.ghcr_creds flux-system/ghcr-credentials
           terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s 
         # plan.out
