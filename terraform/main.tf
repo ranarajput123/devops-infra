@@ -21,10 +21,12 @@ module "gke_cluster" {
   env                    = var.environment
   vpc_network_id         = module.vpc.vpc_id
   subnet_id              = module.vpc.subnet_id
+  master_node_cidr       = module.vpc.master_node_cidr
   pods_cidr              = module.vpc.pods_cidr
   services_cidr          = module.vpc.services_cidr
   pods_ip_range_name     = module.vpc.pods_ip_range_name
   services_ip_range_name = module.vpc.services_ip_range_name
+  project                = var.project
 
   depends_on = [module.gcp, module.vpc]
 }

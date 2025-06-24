@@ -1,3 +1,6 @@
+variable "project" {
+  type = string
+}
 variable "region" {
   description = "The region where the GKE cluster will be created."
   type        = string
@@ -16,6 +19,10 @@ variable "subnet_id" {
   type        = string
 }
 
+variable "master_node_cidr" {
+  description = "The CIDR range for master nodes in the GKE cluster."
+  type        = string
+}
 variable "pods_ip_range_name" {
   description = "The name of the secondary range for pods in the GKE cluster."
   type        = string

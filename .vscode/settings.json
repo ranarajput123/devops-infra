@@ -3,6 +3,7 @@
         "gitops",
         "kustomization",
         "nonprod",
+        "preemptible",
         "subnetworks",
         "tfvars"
     ]

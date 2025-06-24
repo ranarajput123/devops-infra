@@ -48,3 +48,7 @@ output "services_cidr" {
   value       = google_compute_subnetwork.private_subnet.secondary_ip_range[1].ip_cidr_range
 }
 
+output "master_node_cidr" {
+  description = "The CIDR range for master nodes "
+  value       = local.master_node_cidr
+}

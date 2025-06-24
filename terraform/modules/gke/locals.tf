@@ -21,4 +21,19 @@ locals {
     "104.30.132.68/32",
     "104.30.134.19/32",
   ]
+
+  node_pool_sa_permissions = [
+    "artifactregistry.dockerimages.get",
+    "artifactregistry.dockerimages.list",
+    "artifactregistry.repositories.downloadArtifacts",
+    "autoscaling.sites.writeMetrics",
+    "logging.logEntries.create",
+    "monitoring.metricDescriptors.list",
+    "monitoring.timeSeries.create",
+    "storage.objects.get",
+    "storage.objects.list",
+  ]
+
+  gke_identity_pool = "${var.project}.svc.id.goog"
+
 }
