@@ -36,8 +36,6 @@ module "flux" {
   gitops_repo_name    = var.gitops_repo_name
   github_token        = data.google_secret_manager_secret_version.github_token.secret_data
   project             = var.project
-
-  depends_on = [module.gke_cluster, data.google_client_config.default]
 }
 
 # Just creating a single key for now due to learning purpose, can be extended later
@@ -45,8 +43,8 @@ module "kms" {
   source        = "./modules/kms"
   region        = var.region
   project       = var.project
-  key_ring_name = "devops-learning-key-ring"
-  key_name      = "devops-learning-crypto-key"
+  key_ring_name = "personal-key-ring"
+  key_name      = "personal-crypto-key"
 }
 
 module "teams" {
@@ -55,16 +53,4 @@ module "teams" {
   frontend_devs   = []
   backend_devs    = []
   full_stack_devs = []
-}
-
-resource "tls_private_key" "gitops_ssh_key" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P256"
-}
-
-resource "github_repository_deploy_key" "gitops_deploy_key" {
-  repository = var.gitops_repo_name
-  title      = "Flux Git ops Deploy Key"
-  key        = tls_private_key.gitops_ssh_key.public_key_openssh
-  read_only  = false
 }

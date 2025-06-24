@@ -1,9 +1,3 @@
-
-# provider "kubernetes" {
-#   host                   = var.api_server_endpoint
-#   token                  = var.gcp_access_token
-#   cluster_ca_certificate = var.b64_ca_cert
-# }
 # Create namespace for Flux components
 resource "kubernetes_namespace" "flux" {
   metadata {
@@ -12,39 +6,39 @@ resource "kubernetes_namespace" "flux" {
 }
 
 # Git ops key pair for Flux
-# resource "tls_private_key" "gitops_ssh_key" {
-#   algorithm   = "ECDSA"
-#   ecdsa_curve = "P256"
-# }
+resource "tls_private_key" "gitops_ssh_key" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P256"
+}
 
-# resource "github_repository_deploy_key" "gitops_deploy_key" {
-#   repository = var.gitops_repo_name
-#   title      = "Flux Git ops Deploy Key"
-#   key        = tls_private_key.gitops_ssh_key.public_key_openssh
-#   read_only  = false
-# }
+resource "github_repository_deploy_key" "gitops_deploy_key" {
+  repository = var.gitops_repo_name
+  title      = "Flux Git ops Deploy Key"
+  key        = tls_private_key.gitops_ssh_key.public_key_openssh
+  read_only  = false
+}
 
-# # Adding provider block here because of dependency on ssh key
-# provider "flux" {
-#   kubernetes = {
-#     host                   = var.api_server_endpoint
-#     cluster_ca_certificate = var.b64_ca_cert
+# Adding provider block here because of dependency on ssh key
+provider "flux" {
+  kubernetes = {
+    host                   = var.api_server_endpoint
+    cluster_ca_certificate = var.b64_ca_cert
 
-#     exec = {
-#       api_version = "client.authentication.k8s.io/v1beta1"
-#       command     = "gcloud"
-#       args        = ["auth", "print-access-token"]
-#     }
-#   }
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "gcloud"
+      args        = ["auth", "print-access-token"]
+    }
+  }
 
-#   git = {
-#     url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
-#     ssh = {
-#       username    = "git"
-#       private_key = tls_private_key.gitops_ssh_key.private_key_pem
-#     }
-#   }
-# }
+  git = {
+    url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
+    ssh = {
+      username    = "git"
+      private_key = tls_private_key.gitops_ssh_key.private_key_pem
+    }
+  }
+}
 
 # Helm charts key pair for Flux
 resource "tls_private_key" "charts_ssh_key" {
@@ -114,7 +108,5 @@ resource "flux_bootstrap_git" "this" {
 
   log_level = "debug"
 
-  depends_on = [kubernetes_namespace.flux,
-    # github_repository_deploy_key.gitops_deploy_key
-  ]
+  depends_on = [kubernetes_namespace.flux, github_repository_deploy_key.gitops_deploy_key]
 }

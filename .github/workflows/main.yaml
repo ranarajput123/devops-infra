@@ -27,103 +27,103 @@ env:
   TF_CLI_ARGS: '-no-color'
   # TF_LOG: 'INFO'
 jobs:
-  # plan-nonprod:
-  #   name: Terraform Plan Non-Prod
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     tf-version: ${{ steps.tf-version.outputs.version }}
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
+  plan-nonprod:
+    name: Terraform Plan Non-Prod
+    runs-on: ubuntu-latest
+    outputs:
+      tf-version: ${{ steps.tf-version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  #     - name: Authenticate to Google Cloud
-  #       id: auth
-  #       uses: google-github-actions/auth@v2
-  #       with:
-  #         token_format: 'access_token'
-  #         workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
-  #         service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
-  #         export_environment_variables: true
-  #         create_credentials_file: true
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.NP_GCP_WORKLOAD_IDENTITY_POOL }}/providers/github
+          service_account: ${{ secrets.NP_GCP_SERVICE_ACCOUNT_EMAIL }}
+          export_environment_variables: true
+          create_credentials_file: true
       
-  #     - name: Echo GOOGLE_APPLICATION_CREDENTIALS
-  #       run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
+      - name: Echo GOOGLE_APPLICATION_CREDENTIALS
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
 
-  #     - id: tf-version
-  #       name: Read Terraform version
-  #       run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
+      - id: tf-version
+        name: Read Terraform version
+        run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
 
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3.1.0
-  #       with:
-  #         terraform_version: ${{ steps.tf-version.outputs.version }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.0
+        with:
+          terraform_version: ${{ steps.tf-version.outputs.version }}
 
-  #     - name: Cache Terraform
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ~/.terraform.d/plugin-cache
-  #           terraform/.terraform
-  #         key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-terraform-
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            terraform/.terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
 
-  #     - name: Terraform Format Check
-  #       run: terraform fmt -check
+      - name: Terraform Format Check
+        run: terraform fmt -check
 
-  #     - name: Terraform Init
-  #       run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
+      - name: Terraform Init
+        run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
-  #     - name: Terraform Validate
-  #       run: terraform validate
+      - name: Terraform Validate
+        run: terraform validate
 
-  #     - name: Terraform Plan
-  #       id: plan
-  #       run: |
-  #         terraform plan \
-  #          -input=false \
-  #          -no-color \
-  #          -detailed-exitcode \
-  #          -lock-timeout=300s \
-  #          -out=plan.out \
-  #          -var-file=env/nonprod/nonprod.tfvars
-  #          EXIT_CODE=$?
-  #         if [ "$EXIT_CODE" -eq 1 ]; then
-  #           echo "Terraform plan failed"
-  #           exit 1
-  #         fi
-  #       continue-on-error: true
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan \
+           -input=false \
+           -no-color \
+           -detailed-exitcode \
+           -lock-timeout=300s \
+           -out=plan.out \
+           -var-file=env/nonprod/nonprod.tfvars
+           EXIT_CODE=$?
+          if [ "$EXIT_CODE" -eq 1 ]; then
+            echo "Terraform plan failed"
+            exit 1
+          fi
+        continue-on-error: true
       
-  #     - name: Upload Plan File For Apply Job
-  #       if: github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: tfplan-nonprod
-  #         if-no-files-found: error
-  #         path: terraform/plan.out
+      - name: Upload Plan File For Apply Job
+        if: github.ref == 'refs/heads/main' # Only run on main branch since apply will be only on main
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-nonprod
+          if-no-files-found: error
+          path: terraform/plan.out
   
-  # approve_nonprod_apply:
-  #   name: Approve NonProd Apply
-  #   permissions:
-  #     issues: write
-  #   needs: plan-nonprod
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }} # Only run on main branch and not on PRs
-  #   steps:
-  #     - name: Manual Approval for NonProd Deployment
-  #       uses: trstringer/manual-approval@v1
-  #       with:
-  #         secret: ${{ secrets.GITHUB_TOKEN }}
-  #         approvers: ${{ github.actor }}
-  #         minimum-approvals: 1
-  #         issue-title: 'Apply Terraform NonProd Environment'
-  #         issue-body: 'Please approve the NonProd Terraform Plan before applying changes.'
-  #         exclude-workflow-initiator-as-approver: false
+  approve_nonprod_apply:
+    name: Approve NonProd Apply
+    permissions:
+      issues: write
+    needs: plan-nonprod
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }} # Only run on main branch and not on PRs
+    steps:
+      - name: Manual Approval for NonProd Deployment
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: ${{ github.actor }}
+          minimum-approvals: 1
+          issue-title: 'Apply Terraform NonProd Environment'
+          issue-body: 'Please approve the NonProd Terraform Plan before applying changes.'
+          exclude-workflow-initiator-as-approver: false
 
   apply-nonprod:
     name: Terraform Apply Non-Prod
     runs-on: ubuntu-latest
-    # needs: [plan-nonprod, approve_nonprod_apply]
+    needs: [plan-nonprod, approve_nonprod_apply]
     if: github.ref == 'refs/heads/main' # Only run on main branch
     steps:
       - name: Checkout repository
@@ -141,14 +141,14 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.0
-        # with:
-        #   terraform_version: ${{ needs.plan-nonprod.outputs.tf-version }}
+        with:
+          terraform_version: ${{ needs.plan-nonprod.outputs.tf-version }}
       
-      # - name: Download Plan File
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: tfplan-nonprod
-      #     path: terraform
+      - name: Download Plan File
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-nonprod
+          path: terraform
       
       - name: Debug directory contents
         run: |
@@ -159,6 +159,4 @@ jobs:
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Apply
-        run: |
-          terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s 
-        # plan.out
+        run: terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out

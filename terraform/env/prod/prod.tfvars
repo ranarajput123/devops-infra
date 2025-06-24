@@ -1,4 +1,4 @@
-project      = "devops-learning-007"
+project      = ""
 region       = "europe-west1"
 environment  = "prod"
 github_owner = "ranarajput123"
