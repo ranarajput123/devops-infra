@@ -71,6 +71,11 @@ jobs:
 
       - name: Terraform Format Check
         run: terraform fmt -check
+      
+      - name: Debug directory contentsAdd commentMore actions
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -lah
 
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
