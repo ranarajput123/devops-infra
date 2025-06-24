@@ -17,8 +17,8 @@ provider "kubernetes" {
 # Adding provider block here because of dependency on ssh key
 provider "flux" {
   kubernetes = {
-    host                   = var.api_server_endpoint
-    cluster_ca_certificate = var.b64_ca_cert
+    host                   = "https://${module.gke_cluster.api_server_endpoint}"
+    cluster_ca_certificate = base64decode(module.gke_cluster.b64_ca_cert)
 
     exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
