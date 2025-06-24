@@ -4,7 +4,6 @@ resource "google_compute_network" "vpc_network" {
   routing_mode                    = var.routing_mode
   description                     = "VPC network for ${var.env} environment"
   delete_default_routes_on_create = true
-
 }
 
 

@@ -151,4 +151,6 @@ jobs:
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
       - name: Terraform Apply
-        run: terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out
+        run: terraform destroy -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve
+          # terraform apply -var-file=env/nonprod/nonprod.tfvars -input=false -no-color -auto-approve -lock-timeout=300s plan.out
+          
