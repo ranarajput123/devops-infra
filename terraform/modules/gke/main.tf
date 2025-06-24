@@ -1,6 +1,7 @@
 resource "google_container_cluster" "primary" {
-  name     = "${var.env}-gke-cluster"
-  location = var.region
+  name                = "${var.env}-gke-cluster"
+  location            = var.region
+  deletion_protection = false
 
   node_pool {
     name = "default-node-pool"
