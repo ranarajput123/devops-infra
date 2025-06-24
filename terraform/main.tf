@@ -27,8 +27,8 @@ module "gke_cluster" {
 
 module "flux" {
   source              = "./modules/flux"
-  api_server_endpoint = module.gke_cluster.api_server_endpoint
-  b64_ca_cert         = module.gke_cluster.b64_ca_cert
+  api_server_endpoint = "https://${module.gke_cluster.api_server_endpoint}"
+  b64_ca_cert         = base64decode(module.gke_cluster.b64_ca_cert)
   charts_repo_name    = var.charts_repo_name
   environment         = var.environment
   gcp_access_token    = data.google_client_config.default.access_token

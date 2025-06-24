@@ -9,8 +9,7 @@ provider "github" {
 }
 
 provider "kubernetes" {
-  # host                   = "https://${module.gke_cluster.api_server_endpoint}"
-  # token                  = data.google_client_config.default.access_token
-  # cluster_ca_certificate = base64decode(module.gke_cluster.b64_ca_cert)
-  config_path = "~/.kube/config"
+  host                   = "https://${module.gke_cluster.api_server_endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(module.gke_cluster.b64_ca_cert)
 }
