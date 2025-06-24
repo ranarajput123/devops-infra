@@ -1,3 +1,9 @@
+
+provider "kubernetes" {
+  host                   = var.api_server_endpoint
+  token                  = var.gcp_access_token
+  cluster_ca_certificate = var.b64_ca_cert
+}
 # Create namespace for Flux components
 resource "kubernetes_namespace" "flux" {
   metadata {
