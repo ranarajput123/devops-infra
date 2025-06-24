@@ -3,7 +3,7 @@ resource "google_project_service" "api" {
   project  = var.project
   service  = each.value
 
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 
