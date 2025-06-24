@@ -56,3 +56,15 @@ module "teams" {
   backend_devs    = []
   full_stack_devs = []
 }
+
+resource "tls_private_key" "gitops_ssh_key" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P256"
+}
+
+resource "github_repository_deploy_key" "gitops_deploy_key" {
+  repository = var.gitops_repo_name
+  title      = "Flux Git ops Deploy Key"
+  key        = tls_private_key.gitops_ssh_key.public_key_openssh
+  read_only  = false
+}
