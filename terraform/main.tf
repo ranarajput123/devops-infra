@@ -36,6 +36,8 @@ module "flux" {
   gitops_repo_name    = var.gitops_repo_name
   github_token        = data.google_secret_manager_secret_version.github_token.secret_data
   project             = var.project
+
+  depends_on = [module.gke_cluster, data.google_client_config.default]
 }
 
 # Just creating a single key for now due to learning purpose, can be extended later
