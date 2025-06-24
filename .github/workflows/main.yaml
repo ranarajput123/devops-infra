@@ -55,6 +55,10 @@ jobs:
         with:
           terraform_version: ${{ steps.tf-version.outputs.version }}
 
+      - name: Debug directory contentsAdd commentMore actions
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -lah
       - name: Cache Terraform
         uses: actions/cache@v3
         with:
@@ -145,8 +149,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan-nonprod
-          path: terraform
-      
+          path: terraform      
+
       - name: Terraform Init
         run: terraform init -backend-config=env/nonprod/backend.tfvars -input=false -no-color
 
