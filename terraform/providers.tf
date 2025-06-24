@@ -25,7 +25,7 @@ provider "flux" {
     url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
     ssh = {
       username    = "git"
-      private_key = var._private_key_pem
+      private_key = module.github.gitops_private_key
     }
   }
 }
