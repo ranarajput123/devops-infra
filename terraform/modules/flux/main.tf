@@ -1,9 +1,9 @@
 
-provider "kubernetes" {
-  host                   = var.api_server_endpoint
-  token                  = var.gcp_access_token
-  cluster_ca_certificate = var.b64_ca_cert
-}
+# provider "kubernetes" {
+#   host                   = var.api_server_endpoint
+#   token                  = var.gcp_access_token
+#   cluster_ca_certificate = var.b64_ca_cert
+# }
 # Create namespace for Flux components
 resource "kubernetes_namespace" "flux" {
   metadata {
@@ -29,8 +29,16 @@ provider "flux" {
   kubernetes = {
     host                   = var.api_server_endpoint
     cluster_ca_certificate = var.b64_ca_cert
-    token                  = var.gcp_access_token
+
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "gcloud"
+      args        = ["auth", "print-access-token"]
+    }
   }
+
+  # This ensures cluster is created before using it
+  depends_on = [google_container_cluster.primary]
   git = {
     url = "ssh://git@github.com/${var.github_owner}/${var.gitops_repo_name}.git"
     ssh = {
