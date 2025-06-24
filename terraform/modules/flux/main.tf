@@ -114,5 +114,7 @@ resource "flux_bootstrap_git" "this" {
 
   log_level = "debug"
 
-  depends_on = [kubernetes_namespace.flux, github_repository_deploy_key.gitops_deploy_key]
+  depends_on = [kubernetes_namespace.flux,
+    # github_repository_deploy_key.gitops_deploy_key
+  ]
 }
