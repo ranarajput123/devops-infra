@@ -15,5 +15,5 @@ output "charts_public_key" {
 }
 
 output "github_known_hosts" {
-  value = data.github_known_hosts.default.known_hosts
+  value = local.github_known_hosts
 }
