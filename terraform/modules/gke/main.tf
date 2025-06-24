@@ -13,20 +13,20 @@ resource "google_container_cluster" "primary" {
   network    = var.vpc_network_id
   subnetwork = var.subnet_id
 
-  master_authorized_networks_config {
-    dynamic "cidr_blocks" {
-      for_each = local.ovo_vpn_ip_ranges
-      content {
-        cidr_block   = cidr_blocks.value
-        display_name = "Authorized Network"
-      }
+  # master_authorized_networks_config {
+  #   dynamic "cidr_blocks" {
+  #     for_each = local.ovo_vpn_ip_ranges
+  #     content {
+  #       cidr_block   = cidr_blocks.value
+  #       display_name = "Authorized Network"
+  #     }
 
-    }
-  }
+  #   }
+  # }
 
   private_cluster_config {
     enable_private_nodes    = true
-    enable_private_endpoint = true
+    enable_private_endpoint = false
   }
 
   ip_allocation_policy {
