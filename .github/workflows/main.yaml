@@ -36,7 +36,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud VIA Workload Identity
         id: auth
         uses: google-github-actions/auth@v2
         with:
@@ -126,7 +126,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud VIA Workload Identity
         id: auth
         uses: google-github-actions/auth@v2
         with:
