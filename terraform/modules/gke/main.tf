@@ -10,6 +10,14 @@ resource "google_container_cluster" "primary" {
     workload_pool = local.gke_identity_pool
   }
 
+  node_config {
+    tags = ["private"]
+  }
+  node_pool_auto_config {
+    network_tags {
+      tags = ["private", "gke-node"]
+    }
+  }
   vertical_pod_autoscaling {
     enabled = true
   }
@@ -40,7 +48,6 @@ resource "google_container_cluster" "primary" {
 
   #   }
   # }
-
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_ip_range_name
     services_secondary_range_name = var.services_ip_range_name
@@ -55,7 +62,6 @@ resource "google_container_node_pool" "default" {
   cluster  = google_container_cluster.primary.name
   location = "europe-west1-b"
 
-
   node_config {
     machine_type    = "e2-medium"
     service_account = google_service_account.red_pool_service_account.email
@@ -69,7 +75,7 @@ resource "google_container_node_pool" "default" {
     workload_metadata_config {
       mode = "GKE_METADATA"
     }
-    tags = ["private"]
+    tags = ["private", "prv-gke-node"]
   }
 
   autoscaling {
