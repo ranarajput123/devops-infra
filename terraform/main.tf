@@ -19,8 +19,8 @@ module "gke_cluster" {
   source                 = "./modules/gke"
   region                 = var.region
   env                    = var.environment
-  vpc_network_id         = module.vpc.vpc_id
-  subnet_id              = module.vpc.subnet_id
+  vpc_network_name       = module.vpc.vpc_name
+  subnet_name            = module.vpc.subnet_name
   master_node_cidr       = module.vpc.master_node_cidr
   pods_cidr              = module.vpc.pods_cidr
   services_cidr          = module.vpc.services_cidr
@@ -63,8 +63,8 @@ module "kms" {
   source        = "./modules/kms"
   region        = var.region
   project       = var.project
-  key_ring_name = "personal-key-ring"
-  key_name      = "personal-crypto-key"
+  key_ring_name = "personal-ring"
+  key_name      = "personal-key"
 
   depends_on = [module.gcp]
 }

@@ -5,6 +5,7 @@ resource "google_kms_key_ring" "key_ring" {
   lifecycle {
     prevent_destroy = false
   }
+
 }
 
 resource "google_kms_crypto_key" "crypto_key" {
@@ -14,4 +15,5 @@ resource "google_kms_crypto_key" "crypto_key" {
   lifecycle {
     prevent_destroy = false
   }
+  destroy_scheduled_duration = "86400s" # 1 day, lowest value allowed by GCP
 }
