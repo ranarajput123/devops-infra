@@ -82,13 +82,13 @@ module "gke" {
       # The machine type for the node pool, which determines the CPU and memory resources available to the nodes. e2-medium is a cost-effective machine type for GKE clusters.
       initial_node_count = 1
       # The name of the node pool, which is used to identify the pool within the cluster.
-      machine_type = "e2-medium"
+      machine_type = "e2-standard-4"
       # The zone or region where the node pool is located, which determines the physical location of the nodes. This should match the region of the GKE cluster.
       name = "red-pool"
       # Use preemptible VMs for the node pool, which are cost-effective but can be terminated by GCP at any time. This is useful for non-critical workloads that can tolerate interruptions.
       node_locations = "europe-west1-b"
       # The service account to use for the node pool, which allows the nodes to access GCP resources. We create a service account in the gke_service_account module and provide it here to have more control over the permissions and roles assigned to it.
-      preemptible = true
+      preemptible = false
     }
   ]
   # Use the GKE metadata server for node metadata, which is the recommended setting for GKE clusters, this is to enable Workload Identity in the cluster.
