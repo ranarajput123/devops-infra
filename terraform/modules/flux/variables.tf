@@ -8,7 +8,8 @@ variable "project" {
 }
 
 variable "charts_private_key_pem" {
-  type = string
+  type      = string
+  sensitive = true
 }
 
 variable "charts_public_key_openssh" {
@@ -18,5 +19,6 @@ variable "github_known_hosts" {
   type = string
 }
 variable "github_token" {
-  type = string
+  type      = string
+  sensitive = true
 }

@@ -1,3 +1,4 @@
 google_iam_custom_role vs google_project_iam_custom_role (use beta and change according to usage and need)
 Rotate creds
 Whats happening in firewalls.tf and vpc/main.tf
+Network policy in gke main.tf
